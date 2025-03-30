@@ -1,0 +1,8 @@
+services:
+  ### Training Container
+  trainer:
+    image: labadier/hatespeech-detection-training:latest
+    
+  ### Inference Container
+  inference:
+    image: labadier/hatespeech-detection-inference:latest

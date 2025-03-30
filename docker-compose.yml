@@ -1,0 +1,84 @@
+services:
+  ### MLflow Server
+  mlflow:
+    container_name: mlflow_rlabadie
+    image: ghcr.io/mlflow/mlflow
+    ports:
+      - "0.0.0.0:10010:8080"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:8080
+    volumes:
+      - /home/rlabadie/mlruns:/mlflow/mlruns
+    command: >
+      mlflow server
+        --backend-store-uri sqlite:///mlflow/mlruns/mlflow.db
+        --default-artifact-root /mlflow/mlruns
+        --host 0.0.0.0
+        --port 8080
+    networks:
+      - mlops_net_rlabadie
+      - neuronal_external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mlflowrlabadie.rule=Host(`mlflow.rlabadie.neuronalresearch.media.fhstp.ac.at`)"
+      - "traefik.http.routers.mlflowrlabadie.entrypoints=web-secure"
+      - "traefik.http.routers.mlflowrlabadie.tls=true"
+      - "traefik.http.routers.mlflowrlabadie.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mlflowrlabadie.loadbalancer.server.port=8080"
+      - "traefik.docker.network=neuronal_external"
+
+  ### Training Container
+  trainer:
+    container_name: trainer_rlabadie
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:8080
+      - EXPERIMENT_NAME=Offensive
+      - MODEL_NAME=OffenseBERT
+    depends_on:
+      - mlflow
+    volumes:
+      - /home/rlabadie/mlruns:/mlflow/mlruns
+      - ./dataset:/workspace/dataset
+    deploy: 
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia 
+              device_ids: ["0"] 
+              capabilities: [gpu]
+    command: python training.py
+    networks:
+        - mlops_net_rlabadie
+
+  ### Inference Container
+  inference:
+    container_name: inference_rlabadie
+    ports:
+      - "0.0.0.0:10011:8082"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:8080
+      - MODEL_NAME=OffenseBERT
+      - PYTHON_PORT=8082
+    depends_on:
+      - mlflow
+    volumes:
+      - /home/rlabadie/mlruns:/mlflow/mlruns
+    command: python app.py 
+    networks:
+      - mlops_net_rlabadie
+      - neuronal_external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.inferencerlabadie.rule=Host(`hate.inference.rlabadie.neuronalresearch.media.fhstp.ac.at`)"
+      - "traefik.http.routers.inferencerlabadie.entrypoints=web-secure"
+      - "traefik.http.routers.inferencerlabadie.tls=true"
+      - "traefik.http.routers.inferencerlabadie.tls.certresolver=letsencrypt"
+      - "traefik.http.services.inferencerlabadie.loadbalancer.server.port=8082"
+      - "traefik.docker.network=neuronal_external"
+
+networks:
+  mlops_net_rlabadie:
+    name: mlops_network_rlabadie
+    driver: bridge
+  neuronal_external:
+    external: true

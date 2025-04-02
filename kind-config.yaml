@@ -5,14 +5,14 @@ nodes:
   - role: control-plane
   - role: worker
     extraMounts:
-      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/kind_node_0
-        containerPath: /some/path/in/container
+      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/mlruns
+        containerPath: /mnt/mlflow/mlruns
   - role: worker
     extraMounts:
-      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/kind_node_1
-        containerPath: /some/path/in/container
+      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/mlruns
+        containerPath: /mnt/mlflow/mlruns
   - role: worker
     extraMounts:
-      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/kind_node_2
-        containerPath: /some/path/in/container
+      - hostPath: /Users/labadier/projects/play/HateBot_Kuber/host_mounting_points/mlruns
+        containerPath: /mnt/mlflow/mlruns
   

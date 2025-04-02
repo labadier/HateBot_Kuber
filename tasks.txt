@@ -1,0 +1,3 @@
+create namespace
+create a pod :)
+crear imagenes and pushearlas 

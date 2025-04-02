@@ -13,13 +13,12 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 print('Using computing device:', DEVICE)
 PYTHON_PORT = int(os.environ.get('PYTHON_PORT', None))
-MODEL_NAME = os.environ.get('MODEL_NAME', None)
-MLFLOW_TRACKING_URI = os.environ.get('MLFLOW_TRACKING_URI', None)
+
 
 app = FastAPI()
 
-mlflow.set_tracking_uri(uri=MLFLOW_TRACKING_URI)
-loaded_model = mlflow.pytorch.load_model( f"models:/{MODEL_NAME}/latest", map_location=DEVICE)
+mlflow.set_tracking_uri(uri="http://mlflow:8080")
+loaded_model = mlflow.pytorch.load_model( f"Offensive", map_location=DEVICE)
 loaded_model.device = DEVICE
 
 def predict(objects: dict) -> dict:

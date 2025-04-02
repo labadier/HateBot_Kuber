@@ -1,4 +1,9 @@
 services:
+  ### MLflow Server
+  mlflow:
+    build: 
+      context: ./mlflow
+      dockerfile: Dockerfile.mlflow
   ### Training Container
   trainer:
     build:

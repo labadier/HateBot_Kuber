@@ -27,11 +27,14 @@ WORKDIR /workspace
 # COPY --chown=app:app ../requirements.txt /workspace
 # COPY --chown=app:app ../src-python /workspace
 # COPY --chown=app:app app.py /workspace
-
+COPY Offensive /workspace/Offensive
 COPY requirements.txt /workspace
 
 RUN python -m pip install --upgrade pip && pip install --upgrade --root-user-action=ignore -r requirements.txt
 
+RUN pip install mlflow
+
+RUN mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root . --host 0.0.0.0 --port 8080
 COPY app.py /workspace
 # COPY models /workspace/models
 

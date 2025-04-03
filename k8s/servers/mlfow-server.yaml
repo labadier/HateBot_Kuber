@@ -1,46 +1,26 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hatebot-api
+  name: mlflow-server
   namespace: hatebot
+  labels:
+    app: mlflow
   
 spec:
   containers:
-      # basic container details
     - name: mlflow
       image: ghcr.io/mlflow/mlflow
-      # imagePullPolicy: Never # always pull the image, even if it is already present on the node
-      # hardcode the listening port if Dockerfile isn't set with EXPOSE
       ports:
         - containerPort: 8080
           protocol: TCP
-      # environment variables
       env:
         - name: MLFLOW_TRACKING_URI
           value: http://mlflow:8080
-      command: ["mlflow", "server", "--backend-store-uri", "sqlite:///mlflow/mlruns/mlflow.db", "--default-artifact-root", "/mlflow/mlruns", "--host", "0.0.0.0", "--port", "8080"]  # The port where MLflow server will be exposed
-      # ["ls", "-la" ,"/mlflow/mlruns"]
+      command: ["mlflow", "server", "--backend-store-uri", "sqlite:///mlflow/mlruns/mlflow.db", "--default-artifact-root", "/mlflow/mlruns", "--host", "0.0.0.0", "--port", "8080"] 
       volumeMounts:
         - name: mlflow-volume
-          mountPath: /mlflow/mlruns # this is the container path, not the host path
+          mountPath: /mlflow/mlruns 
 
-    - name: inference
-      image: labadier/hatespeech-detection-inference_kube:latest
-      ports:
-        - containerPort: 8082
-          protocol: TCP
-      env:
-        - name: MLFLOW_TRACKING_URI
-          value: http://localhost:8080
-        - name: MODEL_NAME
-          value: OffenseBERT
-        - name: PYTHON_PORT
-          value: "8082"
-      volumeMounts:
-        - name: mlflow-volume
-          mountPath: /mlflow/mlruns # this is the container path, not the host path
-      command: ["python", "app.py"]  # The port where MLflow server will be exposed
-    
       # readinessProbe:        # I always recommend using these, even if your app has no listening ports (this affects any rolling update)
       #   httpGet:             # Lots of timeout values with defaults, be sure they are ideal for your workload
       #     path: http://mlflow/
@@ -73,13 +53,11 @@ spec:
         path: /mnt/mlflow/mlruns # this is the host path, not the container path
         type: "" # this is the type of volume, not the path
 
-  # per-pod security context
-  # enable seccomp and force non-root user
   securityContext:
 
     seccompProfile:
-      type: RuntimeDefault   # enable seccomp and the runtimes default profile
+      type: RuntimeDefault   
 
-    runAsUser: 501          # hardcode user to non-root if not set in Dockerfile
-    runAsGroup: 20         # hardcode group to non-root if not set in Dockerfile
-    runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+    runAsUser: 501          
+    runAsGroup: 20       
+    runAsNonRoot: true      

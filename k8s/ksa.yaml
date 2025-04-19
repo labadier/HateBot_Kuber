@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hatebot-service-account
+  namespace: hatebot
+
+
+### To mount buckets this must be annotated to the GSA
+# kubectl annotate serviceaccount $KSA \
+#   --namespace $NS \
+#   iam.gke.io/gcp-service-account=$GSA_EMAIL \
+#   --overwrite

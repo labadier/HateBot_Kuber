@@ -5,8 +5,9 @@ metadata:
   namespace: hatebot
 
 spec:
+  type: ClusterIP  # Change to NodePort or LoadBalancer if you want external access
   selector:
-    app: mlflow  # Ensure this matches the label of your MLflow Pod
+    app: mlflow-pods-server  # Ensure this matches the label of your MLflow Pod
   ports:
     - protocol: TCP
       port: 8080   # Exposed service port

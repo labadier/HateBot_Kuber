@@ -18,8 +18,13 @@ MLFLOW_TRACKING_URI = os.environ.get('MLFLOW_TRACKING_URI', None)
 
 app = FastAPI()
 
-mlflow.set_tracking_uri(uri=MLFLOW_TRACKING_URI)
-loaded_model = mlflow.pytorch.load_model( f"models:/{MODEL_NAME}/latest", map_location=DEVICE)
+# mlflow.set_tracking_uri(uri=MLFLOW_TRACKING_URI)
+
+client = mlflow.tracking.MlflowClient(MLFLOW_TRACKING_URI)
+model = client.get_model_version_by_alias(MODEL_NAME, "prod")
+
+# loaded_model = mlflow.pytorch.load_model( f"models:/{MODEL_NAME}/latest", map_location=DEVICE)
+loaded_model = mlflow.pytorch.load_model( f'runs:/{model.run_id}/Offensive', map_location=DEVICE)
 loaded_model.device = DEVICE
 
 def predict(objects: dict) -> dict:

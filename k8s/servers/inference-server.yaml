@@ -19,7 +19,7 @@ spec:
       containers:
           # basic container details
         - name: inference
-          image: labadier/hatespeech-detection-inference_kube
+          image: labadier/hatespeech-detection-inference_kube:v1
           ports:
             - containerPort: 8082
               protocol: TCP
@@ -33,7 +33,13 @@ spec:
           volumeMounts:
             - name: mlflow-volume
               mountPath: /mlflow
+              readOnly: false
           command: ["python", "app.py"]  
+          # command: ["/bin/sh","-c"]
+          # args:
+          #   - |
+          #     exec python -c 
+          #     sleep 30;
         
       # readinessProbe:        # I always recommend using these, even if your app has no listening ports (this affects any rolling update)
       #   httpGet:             # Lots of timeout values with defaults, be sure they are ideal for your workload

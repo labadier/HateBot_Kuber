@@ -6,7 +6,7 @@ metadata:
 
 
 ### To mount buckets this must be annotated to the GSA
-# kubectl annotate serviceaccount $KSA \
-#   --namespace $NS \
-#   iam.gke.io/gcp-service-account=$GSA_EMAIL \
+# kubectl annotate serviceaccount hatebot-service-account \
+#   --namespace hatebot \
+#   iam.gke.io/gcp-service-account=hatebot-service-account@kubernetes-course-455312.iam.gserviceaccount.com \
 #   --overwrite
